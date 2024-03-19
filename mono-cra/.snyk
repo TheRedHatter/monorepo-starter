@@ -1,0 +1,168 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.25.1
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  'npm:debug:20170905':
+    - react-scripts-ts > webpack-dev-server > portfinder > debug:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: 'npm:debug:20170905'
+        path: react-scripts-ts > webpack-dev-server > portfinder > debug
+    - react-scripts-ts > webpack-dev-server > spdy > debug:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: 'npm:debug:20170905'
+        path: react-scripts-ts > webpack-dev-server > spdy > debug
+    - react-scripts-ts > webpack-dev-server > spdy > spdy-transport > debug:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: 'npm:debug:20170905'
+        path: react-scripts-ts > webpack-dev-server > spdy > spdy-transport > debug
+    - react-scripts-ts > jest > jest-cli > jest-runtime > babel-core > debug:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: 'npm:debug:20170905'
+        path: react-scripts-ts > jest > jest-cli > jest-runtime > babel-core > debug
+    - react-scripts-ts > fork-ts-checker-webpack-plugin > chokidar > fsevents > node-pre-gyp > tar-pack > debug:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: 'npm:debug:20170905'
+        path: >-
+          react-scripts-ts > fork-ts-checker-webpack-plugin > chokidar >
+          fsevents > node-pre-gyp > tar-pack > debug
+    - react-scripts-ts > jest > jest-cli > istanbul-api > istanbul-lib-instrument > babel-template > babel-traverse > debug:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: 'npm:debug:20170905'
+        path: >-
+          react-scripts-ts > jest > jest-cli > istanbul-api >
+          istanbul-lib-instrument > babel-template > babel-traverse > debug
+  'npm:extend:20180424':
+    - react-scripts-ts > fork-ts-checker-webpack-plugin > chokidar > fsevents > node-pre-gyp > request > extend:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: 'npm:extend:20180424'
+        path: >-
+          react-scripts-ts > fork-ts-checker-webpack-plugin > chokidar >
+          fsevents > node-pre-gyp > request > extend
+    - react-scripts-ts > jest > jest-cli > jest-config > jest-environment-jsdom > jsdom > request > extend:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: 'npm:extend:20180424'
+        path: >-
+          react-scripts-ts > jest > jest-cli > jest-config >
+          jest-environment-jsdom > jsdom > request > extend
+  'npm:hoek:20180212':
+    - react-scripts-ts > fork-ts-checker-webpack-plugin > chokidar > fsevents > node-pre-gyp > request > hawk > hoek:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: 'npm:hoek:20180212'
+        path: >-
+          react-scripts-ts > fork-ts-checker-webpack-plugin > chokidar >
+          fsevents > node-pre-gyp > request > hawk > hoek
+    - react-scripts-ts > fork-ts-checker-webpack-plugin > chokidar > fsevents > node-pre-gyp > request > hawk > boom > hoek:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: 'npm:hoek:20180212'
+        path: >-
+          react-scripts-ts > fork-ts-checker-webpack-plugin > chokidar >
+          fsevents > node-pre-gyp > request > hawk > boom > hoek
+    - react-scripts-ts > fork-ts-checker-webpack-plugin > chokidar > fsevents > node-pre-gyp > request > hawk > sntp > hoek:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: 'npm:hoek:20180212'
+        path: >-
+          react-scripts-ts > fork-ts-checker-webpack-plugin > chokidar >
+          fsevents > node-pre-gyp > request > hawk > sntp > hoek
+    - react-scripts-ts > jest > jest-cli > jest-config > jest-environment-jsdom > jsdom > request > hawk > hoek:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: 'npm:hoek:20180212'
+        path: >-
+          react-scripts-ts > jest > jest-cli > jest-config >
+          jest-environment-jsdom > jsdom > request > hawk > hoek
+    - react-scripts-ts > jest > jest-cli > jest-config > jest-environment-jsdom > jsdom > request > hawk > boom > hoek:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: 'npm:hoek:20180212'
+        path: >-
+          react-scripts-ts > jest > jest-cli > jest-config >
+          jest-environment-jsdom > jsdom > request > hawk > boom > hoek
+    - react-scripts-ts > jest > jest-cli > jest-config > jest-environment-jsdom > jsdom > request > hawk > sntp > hoek:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: 'npm:hoek:20180212'
+        path: >-
+          react-scripts-ts > jest > jest-cli > jest-config >
+          jest-environment-jsdom > jsdom > request > hawk > sntp > hoek
+    - react-scripts-ts > jest > jest-cli > jest-config > jest-environment-jsdom > jsdom > request > hawk > cryptiles > boom > hoek:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: 'npm:hoek:20180212'
+        path: >-
+          react-scripts-ts > jest > jest-cli > jest-config >
+          jest-environment-jsdom > jsdom > request > hawk > cryptiles > boom >
+          hoek
+  SNYK-JS-LODASH-567746:
+    - react-scripts-ts > html-webpack-plugin > lodash:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: SNYK-JS-LODASH-567746
+        path: react-scripts-ts > html-webpack-plugin > lodash
+    - react-scripts-ts > webpack-manifest-plugin > lodash:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: SNYK-JS-LODASH-567746
+        path: react-scripts-ts > webpack-manifest-plugin > lodash
+    - react-scripts-ts > extract-text-webpack-plugin > async > lodash:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: SNYK-JS-LODASH-567746
+        path: react-scripts-ts > extract-text-webpack-plugin > async > lodash
+    - react-scripts-ts > react-dev-utils > inquirer > lodash:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: SNYK-JS-LODASH-567746
+        path: react-scripts-ts > react-dev-utils > inquirer > lodash
+    - react-scripts-ts > webpack-dev-server > http-proxy-middleware > lodash:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: SNYK-JS-LODASH-567746
+        path: react-scripts-ts > webpack-dev-server > http-proxy-middleware > lodash
+    - react-scripts-ts > jest > jest-cli > jest-runtime > babel-core > lodash:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: SNYK-JS-LODASH-567746
+        path: >-
+          react-scripts-ts > jest > jest-cli > jest-runtime > babel-core >
+          lodash
+    - react-scripts-ts > jest > jest-cli > istanbul-api > istanbul-lib-instrument > babel-generator > lodash:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: SNYK-JS-LODASH-567746
+        path: >-
+          react-scripts-ts > jest > jest-cli > istanbul-api >
+          istanbul-lib-instrument > babel-generator > lodash
+    - react-scripts-ts > jest > jest-cli > istanbul-api > istanbul-lib-instrument > babel-template > lodash:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: SNYK-JS-LODASH-567746
+        path: >-
+          react-scripts-ts > jest > jest-cli > istanbul-api >
+          istanbul-lib-instrument > babel-template > lodash
+    - react-scripts-ts > jest > jest-cli > jest-runtime > babel-core > babel-register > lodash:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: SNYK-JS-LODASH-567746
+        path: >-
+          react-scripts-ts > jest > jest-cli > jest-runtime > babel-core >
+          babel-register > lodash
+    - react-scripts-ts > jest > jest-cli > istanbul-api > istanbul-lib-instrument > babel-generator > babel-types > lodash:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: SNYK-JS-LODASH-567746
+        path: >-
+          react-scripts-ts > jest > jest-cli > istanbul-api >
+          istanbul-lib-instrument > babel-generator > babel-types > lodash
+    - react-scripts-ts > jest > jest-cli > istanbul-api > istanbul-lib-instrument > babel-template > babel-traverse > lodash:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: SNYK-JS-LODASH-567746
+        path: >-
+          react-scripts-ts > jest > jest-cli > istanbul-api >
+          istanbul-lib-instrument > babel-template > babel-traverse > lodash
+  'npm:stringstream:20180511':
+    - react-scripts-ts > fork-ts-checker-webpack-plugin > chokidar > fsevents > node-pre-gyp > request > stringstream:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: 'npm:stringstream:20180511'
+        path: >-
+          react-scripts-ts > fork-ts-checker-webpack-plugin > chokidar >
+          fsevents > node-pre-gyp > request > stringstream
+    - react-scripts-ts > jest > jest-cli > jest-config > jest-environment-jsdom > jsdom > request > stringstream:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: 'npm:stringstream:20180511'
+        path: >-
+          react-scripts-ts > jest > jest-cli > jest-config >
+          jest-environment-jsdom > jsdom > request > stringstream
+  'npm:tough-cookie:20170905':
+    - react-scripts-ts > fork-ts-checker-webpack-plugin > chokidar > fsevents > node-pre-gyp > request > tough-cookie:
+        patched: '2024-03-19T22:58:47.300Z'
+        id: 'npm:tough-cookie:20170905'
+        path: >-
+          react-scripts-ts > fork-ts-checker-webpack-plugin > chokidar >
+          fsevents > node-pre-gyp > request > tough-cookie
