@@ -6,11 +6,12 @@ on:
   pull_request:
     branches: [ "master" ]
   schedule:
-     - cron: '25 23 * * 5'
+    - cron: '25 23 * * 5'
   workflow_dispatch:
 
 env:
-  DETEKT_RELEASE_TAG: v1.23.8
+  # Fallback version if "latest" cannot be resolved
+  DETEKT_FALLBACK_TAG: v1.23.8
 
 jobs:
   scan:
@@ -20,44 +21,37 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Get Detekt download URL
-      id: detekt_info
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # Fetch latest Detekt release version (with fallback)
+    - name: Get latest Detekt release
+      id: detekt_version
       run: |
-        gh api graphql --field tagName=$DETEKT_RELEASE_TAG --raw-field query='
-          query getReleaseAssetDownloadUrl($tagName: String!) {
-            repository(name: "detekt", owner: "detekt") {
-              release(tagName: $tagName) {
-                releaseAssets(name: "detekt", first: 1) {
-                  nodes {
-                    downloadUrl
-                  }
-                }
-              }
-            }
-          }
-        ' 1> gh_response.json
+        latest=$(curl -s https://api.github.com/repos/detekt/detekt/releases/latest | jq -r .tag_name)
+        if [ -z "$latest" ] || [ "$latest" == "null" ]; then
+          echo "⚠️ Failed to fetch latest release. Falling back to $DETEKT_FALLBACK_TAG"
+          latest=$DETEKT_FALLBACK_TAG
+        fi
+        echo "tag=$latest" >> $GITHUB_OUTPUT
 
-        DETEKT_DOWNLOAD_URL=$(jq --raw-output '.data.repository.release.releaseAssets.nodes[0].downloadUrl' gh_response.json)
-        echo "download_url=$DETEKT_DOWNLOAD_URL" >> $GITHUB_OUTPUT
-
+    # Setup Detekt with resolved version
     - name: Setup Detekt
       run: |
-        dest=$( mktemp -d )
-        curl --request GET \
-          --url ${{ steps.detekt_info.outputs.download_url }} \
-          --silent \
-          --location \
-          --output $dest/detekt
-        chmod a+x $dest/detekt
+        dest=$(mktemp -d)
+        version=${{ steps.detekt_version.outputs.tag }}
+        echo "📥 Downloading Detekt $version"
+        curl -sSL \
+          -o $dest/detekt.jar \
+          https://github.com/detekt/detekt/releases/download/$version/detekt-cli-${version#v}-all.jar
+        echo "java -jar $dest/detekt.jar" > $dest/detekt
+        chmod +x $dest/detekt
         echo $dest >> $GITHUB_PATH
 
+    # Run Detekt and generate SARIF output
     - name: Run Detekt
       continue-on-error: true
       run: |
         detekt --input ${{ github.workspace }} --report sarif:${{ github.workspace }}/detekt.sarif.json
 
+    # Make SARIF artifact locations relative
     - name: Make artifact location URIs relative
       continue-on-error: true
       run: |
@@ -68,6 +62,7 @@ jobs:
             ${{ github.workspace }}/detekt.sarif.json
         )" > ${{ github.workspace }}/detekt.sarif.json
 
+    # Upload SARIF to GitHub Code Scanning
     - uses: github/codeql-action/upload-sarif@v3
       with:
         sarif_file: ${{ github.workspace }}/detekt.sarif.json
