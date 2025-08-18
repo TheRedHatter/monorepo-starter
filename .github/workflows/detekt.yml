@@ -24,7 +24,6 @@ jobs:
           java-version: 17
 
       - name: Download Detekt (latest with fallback)
-        id: detekt-download
         run: |
           set -e
           dest=$(mktemp -d)
@@ -44,22 +43,33 @@ jobs:
           chmod +x "$dest/detekt"
           echo "$dest" >> $GITHUB_PATH
 
-      - name: Run Detekt
+      - name: Run Detekt on all modules
         continue-on-error: true
         run: |
           mkdir -p reports
-          detekt \
-            --input mono-jvm \
-            --report sarif:reports/detekt.sarif.json || true
+          # find all source roots (modules containing kotlin files)
+          modules=$(find . -name "build.gradle*" -exec dirname {} \; | sort -u)
+          echo "📦 Detected modules:"
+          echo "$modules"
 
-      - name: Fix SARIF paths (optional)
+          # run detekt for each module and merge sarif
+          run_index=0
+          echo '{"version":"2.1.0","runs":[]}' > reports/detekt.merged.json
+          for m in $modules; do
+            echo "▶️ Running Detekt on $m"
+            detekt --input "$m" --report sarif:reports/detekt.$run_index.json || true
+            if [ -s reports/detekt.$run_index.json ]; then
+              jq -s '.[0].runs += .[1].runs | .[0]' reports/detekt.merged.json reports/detekt.$run_index.json > reports/tmp.json
+              mv reports/tmp.json reports/detekt.merged.json
+            fi
+            run_index=$((run_index+1))
+          done
+
+      - name: Ensure valid SARIF
         if: always()
         run: |
-          if [ -f reports/detekt.sarif.json ]; then
-            jq \
-              --arg github_workspace "$GITHUB_WORKSPACE" \
-              '.runs[].results[].locations[].physicalLocation.artifactLocation.uri |= if test($github_workspace) then .[($github_workspace | length + 1):] else . end' \
-              reports/detekt.sarif.json > reports/detekt.fixed.json || cp reports/detekt.sarif.json reports/detekt.fixed.json
+          if [ -f reports/detekt.merged.json ]; then
+            cp reports/detekt.merged.json reports/detekt.fixed.json
           else
             echo '{"version":"2.1.0","runs":[]}' > reports/detekt.fixed.json
           fi
