@@ -51,12 +51,14 @@ jobs:
         detekt --input ${{ github.workspace }} \
                --report sarif:${{ github.workspace }}/detekt.sarif.json || true
 
-    # Ensure SARIF file always exists (even if Detekt crashes)
+    # Ensure SARIF file always exists (GitHub requires at least one run)
     - name: Ensure SARIF exists
       run: |
         if [ ! -s "${{ github.workspace }}/detekt.sarif.json" ]; then
-          echo '{"version":"2.1.0","runs":[]}' > ${{ github.workspace }}/detekt.sarif.json
+          echo '{"version":"2.1.0","runs":[{"tool":{"driver":{"name":"detekt","informationUri":"https://detekt.dev","rules":[]}},"results":[]}]}' \
+            > ${{ github.workspace }}/detekt.sarif.json
         fi
+
 
     # Make SARIF artifact locations relative
     - name: Make artifact location URIs relative
