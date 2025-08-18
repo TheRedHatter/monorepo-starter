@@ -1,77 +1,71 @@
-name: Scan with Detekt
+name: Detekt Analysis
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "master" ]
-  schedule:
-    - cron: '25 23 * * 5'
-  workflow_dispatch:
-
-env:
-  # Fallback version if "latest" cannot be resolved
-  DETEKT_FALLBACK_TAG: v1.23.8
+    branches: [ main ]
 
 jobs:
-  scan:
-    name: Scan
+  detekt:
     runs-on: ubuntu-latest
 
+    env:
+      DETEKT_FALLBACK_TAG: v1.23.8
+
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    # Fetch latest Detekt release version (with fallback)
-    - name: Get latest Detekt release
-      id: detekt_version
-      run: |
-        latest=$(curl -s https://api.github.com/repos/detekt/detekt/releases/latest | jq -r .tag_name)
-        if [ -z "$latest" ] || [ "$latest" == "null" ]; then
-          echo "⚠️ Failed to fetch latest release. Falling back to $DETEKT_FALLBACK_TAG"
-          latest=$DETEKT_FALLBACK_TAG
-        fi
-        echo "tag=$latest" >> $GITHUB_OUTPUT
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
 
-    # Setup Detekt with resolved version
-    - name: Setup Detekt
-      run: |
-        dest=$(mktemp -d)
-        version=${{ steps.detekt_version.outputs.tag }}
-        echo "📥 Downloading Detekt $version"
-        curl -sSL \
-          -o $dest/detekt.jar \
-          https://github.com/detekt/detekt/releases/download/$version/detekt-cli-${version#v}-all.jar
-        echo "java -jar $dest/detekt.jar" > $dest/detekt
-        chmod +x $dest/detekt
-        echo $dest >> $GITHUB_PATH
+      - name: Download Detekt (latest with fallback)
+        id: detekt-download
+        run: |
+          set -e
+          dest=$(mktemp -d)
+          latest_tag=$(curl -s https://api.github.com/repos/detekt/detekt/releases/latest | jq -r .tag_name || echo "")
+          if [ -z "$latest_tag" ] || [ "$latest_tag" == "null" ]; then
+            echo "⚠️ Could not fetch latest tag, falling back to $DETEKT_FALLBACK_TAG"
+            latest_tag=$DETEKT_FALLBACK_TAG
+          fi
+          curl -sSL \
+            "https://github.com/detekt/detekt/releases/download/$latest_tag/detekt" \
+            -o "$dest/detekt" || {
+              echo "⚠️ Failed to download Detekt $latest_tag, falling back to $DETEKT_FALLBACK_TAG"
+              curl -sSL \
+                "https://github.com/detekt/detekt/releases/download/$DETEKT_FALLBACK_TAG/detekt" \
+                -o "$dest/detekt"
+            }
+          chmod +x "$dest/detekt"
+          echo "$dest" >> $GITHUB_PATH
 
-    # Run Detekt and generate SARIF output (never fails CI)
-    - name: Run Detekt
-      run: |
-        detekt --input ${{ github.workspace }} \
-               --report sarif:${{ github.workspace }}/detekt.sarif.json || true
+      - name: Run Detekt
+        continue-on-error: true
+        run: |
+          mkdir -p reports
+          detekt \
+            --input mono-jvm \
+            --report sarif:reports/detekt.sarif.json || true
 
-    # Ensure SARIF file always exists (GitHub requires at least one run)
-    - name: Ensure SARIF exists
-      run: |
-        if [ ! -s "${{ github.workspace }}/detekt.sarif.json" ]; then
-          echo '{"version":"2.1.0","runs":[{"tool":{"driver":{"name":"detekt","informationUri":"https://detekt.dev","rules":[]}},"results":[]}]}' \
-            > ${{ github.workspace }}/detekt.sarif.json
-        fi
+      - name: Fix SARIF paths (optional)
+        if: always()
+        run: |
+          if [ -f reports/detekt.sarif.json ]; then
+            jq \
+              --arg github_workspace "$GITHUB_WORKSPACE" \
+              '.runs[].results[].locations[].physicalLocation.artifactLocation.uri |= if test($github_workspace) then .[($github_workspace | length + 1):] else . end' \
+              reports/detekt.sarif.json > reports/detekt.fixed.json || cp reports/detekt.sarif.json reports/detekt.fixed.json
+          else
+            echo '{"version":"2.1.0","runs":[]}' > reports/detekt.fixed.json
+          fi
 
-
-    # Make SARIF artifact locations relative
-    - name: Make artifact location URIs relative
-      run: |
-        echo "$(
-          jq \
-            --arg github_workspace ${{ github.workspace }} \
-            '. | ( .runs[].results[].locations[].physicalLocation.artifactLocation.uri |= if test($github_workspace) then .[($github_workspace | length | . + 1):] else . end )' \
-            ${{ github.workspace }}/detekt.sarif.json
-        )" > ${{ github.workspace }}/detekt.sarif.json
-
-    # Upload SARIF to GitHub Code Scanning
-    - uses: github/codeql-action/upload-sarif@v3
-      with:
-        sarif_file: ${{ github.workspace }}/detekt.sarif.json
-        checkout_path: ${{ github.workspace }}
+      - name: Upload SARIF results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: reports/detekt.fixed.json
