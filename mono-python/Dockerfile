@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python:3.14.1
 
 RUN pip3 install pipenv
 
